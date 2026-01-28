@@ -62,6 +62,22 @@ export class RequestStorage {
         return this.rowToRequest(row);
     }
 
+    getRequestByPrefix(prefix: string): CapturedRequest | null {
+        const stmt = this.db.prepare(
+            'SELECT * FROM requests WHERE id LIKE ?'
+        );
+
+        const rows = stmt.all(`${prefix}%`) as any[];
+
+        if (rows.length === 0) return null;
+
+        if (rows.length > 1) {
+            throw new Error(`Ambiguous request id prefix (${rows.length} matches)`);
+        }
+
+        return this.rowToRequest(rows[0]);
+    }
+
     getAllRequests(limit: number = 100): CapturedRequest[] {
         const stmt = this.db.prepare(`
       SELECT * FROM requests 
