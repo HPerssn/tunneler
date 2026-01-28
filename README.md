@@ -51,9 +51,9 @@ Internet → Relay Server (VPS) → WebSocket → Local Client → localhost:808
 - [x] Custom tunnel
 - [x] Request/response forwarding
 - [x] SQLite storage (capture all requests)
-- [ ] TUI interface
-- [ ] Request replay
-- [ ] Export as curl
+- [ ] CLI for parsing commands
+- [ ] File watching and auto replay
+- [ ] Handle CLI mode vs tunnel mode 
 
 ## Environment Variables
 

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "chokidar": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/chokidar": "^1.7.5"
+  }
+}
