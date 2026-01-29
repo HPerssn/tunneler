@@ -115,12 +115,13 @@ export class TunnelClient {
             });
 
             const responseBody = await response.arrayBuffer();
+            const responseBodyBase64 = Buffer.from(responseBody).toString('base64')
             const duration = Date.now() - startTime;
 
             capturedRequest.response = {
                 statusCode: response.status,
                 headers: Object.fromEntries(response.headers.entries()),
-                body: responseBody.toString()
+                body: responseBodyBase64
             };
 
             if (this.config.onRequest) {
@@ -132,7 +133,7 @@ export class TunnelClient {
                 requestId: request.requestId,
                 statusCode: response.status,
                 headers: Object.fromEntries(response.headers.entries()),
-                body: responseBody.toString()
+                body: responseBodyBase64
             }));
 
             console.log(`← ${response.status} (${duration}ms)`);
