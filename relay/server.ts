@@ -90,16 +90,21 @@ app.get('/', (_req: Request, res: Response) => {
     });
 });
 
+app.all('/:tunnelId', async (req: Request, res: Response) => {
+    const { tunnelId } = req.params;
+    const path = '/';
+    forwardRequest(tunnelId, path, req, res);
+});
+
 app.all('/:tunnelId/*', async (req: Request, res: Response) => {
     const { tunnelId } = req.params;
     const path = '/' + (req.params[0] || '');
+    forwardRequest(tunnelId, path, req, res);
+});
 
-    console.log(`→ Incoming ${req.method} ${path} for tunnel ${tunnelId}`);
-
+function forwardRequest(tunnelId: string, path: string, req: Request, res: Response) {
     const tunnel = tunnels.get(tunnelId);
-
     if (!tunnel || tunnel.readyState !== WebSocket.OPEN) {
-        console.log(`✗ Tunnel not connected: ${tunnelId}`);
         return res.status(502).json({ error: 'Tunnel not connected' });
     }
 
@@ -107,10 +112,7 @@ app.all('/:tunnelId/*', async (req: Request, res: Response) => {
 
     const timeout = setTimeout(() => {
         pendingRequests.delete(requestId);
-        if (!res.headersSent) {
-            console.log(`✗ Tunnel timeout for request ${requestId.slice(0, 8)}`);
-            res.status(504).json({ error: 'Tunnel timeout' });
-        }
+        if (!res.headersSent) res.status(504).json({ error: 'Tunnel timeout' });
     }, 30000);
 
     pendingRequests.set(requestId, { res, timeout });
@@ -125,15 +127,12 @@ app.all('/:tunnelId/*', async (req: Request, res: Response) => {
             body: req.body ? req.body.toString('base64') : null,
             query: req.query
         }));
-
-        console.log(`→ Forwarded to client: ${requestId.slice(0, 8)}`);
-    } catch (error) {
-        console.error('Error forwarding request:', error);
+    } catch (err) {
         clearTimeout(timeout);
         pendingRequests.delete(requestId);
         res.status(502).json({ error: 'Failed to forward request' });
     }
-});
+}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
