@@ -45,15 +45,23 @@ wss.on('connection', (ws: WebSocket) => {
                     clearTimeout(pending.timeout);
                     pendingRequests.delete(message.requestId);
 
+
                     if (!pending.res.headersSent) {
                         pending.res.status(message.statusCode || 200);
 
+                        const hopByHop = [
+                            'transfer-encoding', 'content-length', 'connection',
+                            'keep-alive', 'te', 'trailer', 'upgrade',
+                            'proxy-agent', 'proxy-authenticate', 'proxy-authorization'
+                        ];
+
                         if (message.headers) {
                             Object.entries(message.headers).forEach(([key, value]) => {
-                                pending.res.setHeader(key, value as string);
+                                if (!hopByHop.includes(key.toLowerCase())) {
+                                    pending.res.setHeader(key, value as string);
+                                }
                             });
                         }
-
                         const body = message.body
                             ? Buffer.from(message.body, 'base64')
                             : '';
