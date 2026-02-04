@@ -38,7 +38,7 @@ export async function watchCommand(args: string[]) {
             storage.close();
             process.exit(1);
         }
-        const request = storage.getRequest(idOrFlag);
+        const request = storage.getRequestByPrefix(idOrFlag);
         if (!request) {
             console.error(`Request ${idOrFlag} not found`);
             storage.close();

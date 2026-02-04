@@ -1,6 +1,5 @@
 import { TunnelClient } from './tunnel.js';
 import { RequestStorage } from './storage.js';
-
 const relayUrl = process.env.RELAY_URL || 'ws://localhost:3000';
 const localPort = parseInt(process.env.LOCAL_PORT || '8080');
 

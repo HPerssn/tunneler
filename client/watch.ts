@@ -18,7 +18,10 @@ export class FileWatcher {
 
     async start() {
         this.watcher = chokidar.watch(this.dir, {
-            ignored: /(^|[\/\\])\../, // ignore dotfiles
+            ignored: [
+                '**/.git/**',
+                '**/node_modules/**'
+            ],
             persistent: true,
             ignoreInitial: true,
             awaitWriteFinish: {
